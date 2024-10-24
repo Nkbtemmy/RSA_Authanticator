@@ -1,0 +1,97 @@
+server:
+  port: 8080
+  domain: ${SERVER:localhost:8080}
+spring:
+  application:
+    name: RSA_Authanticator
+  profiles:
+    active: ${ENVIRONMENT:local}
+  datasource:
+    url: ${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/marketplace?createDatabaseIfNotExist=true}
+    username: ${JDBC_DATABASE_USERNAME:postgres}
+    password: ${JDBC_DATABASE_PASSWORD:admin123!}
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        id:
+          new_generator_mappings: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: ${EMAIL_HOST:sandbox.smtp.mailtrap.io}
+    port: ${EMAIL_PORT:2525}
+    username: ${EMAIL_USERNAME:705d2be64f2ce5}
+    password: ${EMAIL_PASSWORD:a8ab4c437a6cff}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  main:
+    allow-bean-definition-overriding: true
+
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+      enable-auto-commit: false
+      group-id: ${KAFKA_GROUP_ID:5}
+    listener:
+      missing-topics-fatal: false
+    bootstrap-servers: ${KAFKA_BROKER_URL:localhost:29092}
+
+logging:
+  level:
+    org.springframework.data: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+
+
+error:
+  handling:
+    http-status-in-json-response: true
+    exception-logging: NO_LOGGING
+    full-stacktrace-http-statuses: 5xx
+    log-levels:
+      5xx: ERROR
+    codes:
+      UsersEmailUnique: USERS_EMAIL_UNIQUE
+      ProductsNameUnique: PRODUCTS_NAME_UNIQUE
+
+jwt:
+  secret: ${JWT_SECRET:5d812504e725f0a97756cbc593e7cf91525e48e4e327f748617cc7c2d874e731}
+  expiration: ${JWT_EXPIRATION:3600000}  # 1 hour in milliseconds
+web:
+  url: ${WEB_URL:https://imanzi.netlify.app}
+springdoc:
+  pathsToMatch: /api/**
+  api-docs:
+    path: /api/v1/marketplace/v3/api-docs
+    version: openapi_3_0
+    enabled: true
+    resolve-extensions-properties: true
+  swagger-ui:
+    path: /api/v1/marketplace/docs
